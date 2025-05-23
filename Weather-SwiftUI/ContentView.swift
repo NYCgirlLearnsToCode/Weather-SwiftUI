@@ -8,43 +8,39 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State private var isNight = false
+    var weatherArr = [Weather(dayOfWeek: .mon, imageName: .cloudSun, temperature: 74),
+                      Weather(dayOfWeek: .tue, imageName: .cloudSun, temperature: 82),
+                      Weather(dayOfWeek: .wed, imageName: .cloudDriz, temperature: 76),
+                      Weather(dayOfWeek: .thu, imageName: .cloudFog, temperature: 60),
+                      Weather(dayOfWeek: .fri, imageName: .sunMax, temperature: 85)]
+    
     var body: some View {
         ZStack {
-            BackgroundView(topColor: .blue, bottomColor: .lightBlue)
+            BackgroundView(isNight: $isNight)
             VStack {
                 CityTextView(cityName: "Long Island City, NY")
                 
-                WeatherStationView(imageName: "cloud.sun.fill",
+                WeatherStationView(imageName: isNight ? "moon.stars.fill" : "cloud.sun.fill",
                                    temperature: 76)
 
                 HStack(spacing: 20) {
-                    WeatherDayView(dayOfWeek: "TUE",
-                                   imageName: "cloud.sun.fill",
-                                   temperature: 74)
-                    WeatherDayView(dayOfWeek: "WED",
-                                   imageName: "sun.max.fill",
-                                   temperature: 82)
-                    WeatherDayView(dayOfWeek: "THURS",
-                                   imageName: "cloud.drizzle.fill",
-                                   temperature: 76)
-                    WeatherDayView(dayOfWeek: "FRI",
-                                   imageName: "cloud.fog.fill",
-                                   temperature: 70)
-                    WeatherDayView(dayOfWeek: "SAT",
-                                   imageName: "sun.max.fill",
-                                   temperature: 80)
+                    ForEach(weatherArr) { weather in
+                        WeatherDayView(weather: weather)
+                    }
                 }
 
                 Spacer()
                 
                 Button {
-                    //action
-                    print("tapped")
+                    isNight.toggle()
                 } label: {
                     WeatherButton(title: "Change Day Time",
                                   textColor: .blue,
                                   backgroundColor: .white)
                 }
+                .padding()
                 
                 Spacer()
             }
@@ -57,25 +53,23 @@ struct ContentView: View {
 }
 
 struct WeatherDayView: View {
-    
-    var dayOfWeek: String
-    var imageName: String
-    var temperature: Int
+
+    var weather: Weather
     
     
     var body: some View {
         VStack(alignment: .center) {
-            Text(dayOfWeek)
+            Text(weather.dayOfWeek.rawValue)
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
             
-            Image(systemName: imageName)
+            Image(systemName: weather.imageName.rawValue)
                 .renderingMode(.original)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 40, height: 40)
             
-            Text("\(temperature)°")
+            Text("\(weather.temperature)°")
                 .foregroundColor(.white)
                 .font(.system(size: 28, weight: .medium))
         }
@@ -83,11 +77,12 @@ struct WeatherDayView: View {
 }
 
 struct BackgroundView: View {
-    var topColor: Color
-    var bottomColor: Color
+    
+    @Binding var isNight: Bool
 
     var body: some View {
-        LinearGradient(colors: [topColor, bottomColor],
+        LinearGradient(colors: [isNight ? .black : .blue,
+                                isNight ? .gray : .lightBlue],
                        startPoint: .topLeading,
                        endPoint: .bottomTrailing)
         .edgesIgnoringSafeArea(.all)
@@ -124,7 +119,5 @@ struct WeatherStationView: View {
                 .foregroundColor(.white)
         }
         .padding(.bottom, 40)
-        
     }
-    
 }
