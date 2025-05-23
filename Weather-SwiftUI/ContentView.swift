@@ -40,7 +40,6 @@ struct ContentView: View {
                                   textColor: .blue,
                                   backgroundColor: .white)
                 }
-                .padding()
                 
                 Spacer()
             }
